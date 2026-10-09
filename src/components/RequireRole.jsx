@@ -1,0 +1,26 @@
+import { Outlet, Navigate } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
+
+const homeForType = (t) => {
+  if (t === "club_owner") return "/club";
+  if (t === "tournament_organizer") return "/tournaments";
+  if (t === "player") return "/";
+  return "/account";
+};
+
+export default function RequireRole({ allowed }) {
+  const { user, authChecked, isLoadingAuth } = useAuth();
+
+  if (isLoadingAuth || !authChecked) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-lime-400 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!allowed.includes(user?.role)) {
+    return <Navigate to={homeForType(user?.user_type)} replace />;
+  }
+  return <Outlet />;
+}
